@@ -17,11 +17,8 @@ const film = new Schema({
         required: true
     },
     actors: {
-        names: [{
-            type: String,
-            required: true
-        }]
-    },
+        names: [{ type: String }]
+    }
 
 });
 
