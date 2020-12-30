@@ -3,15 +3,13 @@ const mongoose = require('mongoose')
 
 dotenv.config();
 
-module.exports = () => {
+module.exports = function zxc() {
     mongoose.connect(
         process.env.DB_CONNECT,
         {
             useNewUrlParser: true,
-            useUnifiedTopology: true,
-            useFindAndModify: false,
+            useUnifiedTopology: true
         },
         () => console.log('Connected to db')
     )
-    mongoose.set('useCreateIndex', true)
 }
