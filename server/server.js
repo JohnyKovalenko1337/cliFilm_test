@@ -4,7 +4,7 @@ const bodyParser = require('body-parser');
 const dbConnect = require('./mongoConnect/connect');
 const filmRoutes = require('./routes/film-routes');
 
-const port = 3000;
+const port = 3001;
 const app = express();
 
 app.use(bodyParser.json());
@@ -22,7 +22,7 @@ app.use((req, res, next) => {
 app.use('/server', filmRoutes);
 
 app.use((req, res, next) => {
-    return res.json({ message: 'Couldnt find this route' });
+    return res.status(404).json({ message: 'Couldnt find this route' });
 })
 
 dbConnect();
