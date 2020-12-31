@@ -2,7 +2,7 @@
 
 const readline = require('readline');
 const {
-    addFilm, deleteFilm,filmById, filmSorted, filmByName, filmByActor, importFromFile
+    addFilm, deleteFilm,  films, filmByName, filmByActor, importFromFile
 } = require('./requests/films');
 
 const { Film } = require('./cli-quers/films');
@@ -25,101 +25,137 @@ const commands = {
     // ======================== add Film =======================================
     add() {
         let title;
-        let description;
+        let released;
+        let format;
+        let formats = ['VHS', 'DVD', 'Blu-Ray'];
+        let actors = []
         console.clear()
         rl.question(Film.title,
             (line) => {
                 rl.prompt();
                 title = line;       // getting title
-                rl.question(Film.description,
+                rl.question(Film.release,
                     (line) => {
                         rl.prompt();
-                        description = line;       // getting description
-                        addFilm(title, description, currentUser.username); // saving Film
-                        console.log('Film has been added');
-                        rl.prompt();
+                        released = line;       // getting released year
+                        rl.question(Film.format,
+                            (line) => {
+                                if(formats.indexOf(line) == -1){
+                                    console.log("format not found start again")
+                                    return;
+                                }
+                                else{
+                                    format = line;     //getting format
+                                }
+                                rl.question(Film.actors,
+                                    (line) => {
+                                        actors = line.split(',');
+                                        addFilm(title, released, format, actors); // saving Film
+                                        console.log('Film has been added');
+                                        rl.prompt();
+                                    });
+                            });
+
                     });
             });
     },
     // =================================== delete Films ===========================
     delete() {
-        deleteFilm()
+        let id;
+        console.clear();
+
+        films()     // getting Films by username
             .then(Films => {
+                Films.forEach(el => {
+                    delete el._id;
+                    delete el.__v;
+                })
                 console.table(Films);
-                rl.prompt();
+                rl.question("input index of your Film\n> ", (line) => {
+                    rl.prompt();
+                    id = line;        //getting index of my Films array
+                    if (Films[id]) {
+                        deleteFilm(Films[id].title)
+                        console.log("Successfuly deleted");
+                        rl.prompt();
+                    }
+                    else {
+                        console.log("Film With that Id not Found\n>")
+                    }
+                })
             })
     },
     //========================= get Film by id ======================================
     filmId() {
         let id;
-        let newTitle;
-        let newDescription;
         console.clear();
-        filmById(currentUser.username)     //getting Films by username
-            .then(Films => {
-                console.table(Films);
 
+        films()     // getting Films by username
+            .then(Films => {
+                Films.forEach(el => {
+                    delete el._id;
+                    delete el.__v;
+                })
+                console.table(Films);
                 rl.question("input index of your Film\n> ", (line) => {
                     rl.prompt();
 
                     id = line;        //getting index of my Films array
-                    if (Films[id]) {      // if that index exists
-                        rl.question("Input new title for your Film\n> ", (line) => {
-                            newTitle = line;      // setting title
-
-                            rl.question("Input new description for your Film\n> ", (line) => {
-                                rl.prompt();
-                                newDescription = line;      //setting description
-                                updateMyFilm(currentUser.username, id, newTitle, newDescription)    // saving Film
-                                    .then(() => {
-                                        console.log('Film has been updated');
-                                        rl.prompt();
-                                    })
-
-                            });
-                        });
-                    } else {
-                        console.log('No Film with this index found');
+                    if (Films[id]) {
+                        console.table(Films[id]);
                         rl.prompt();
                     }
-                })
+                    else {
+                        console.log("Film With that Id not Found\n>")
+                    }
+
+                });
+
 
             })
     },
     // ================================ get sorted Films ===================================
     get() {
-        let id;
         console.clear();
-        filmSorted(currentUser.username)     // getting Films by username
+        films()     // getting Films by username
             .then(Films => {
+                Films.forEach(el => {
+                    delete el._id;
+                    delete el.__v;
+                })
                 console.table(Films);
-
-                rl.question("input id of your Film\n", (line) => {
-                    rl.prompt();
-
-                    id = line;      //getting index of my Films array
-                    if (Films[id]) {        // if that Film exists
-                        deleteMyFilm(currentUser.username, id)      // deleting Film
-                            .then(() => {
-                                console.log('Film has been deleted');
-                                rl.prompt();
-                            })
-                    }
-                    else {
-                        console.log('No Film with this index found');
-                        rl.prompt();
-                    }
-                });
+                rl.prompt();
             });
     },
-    findByName(){
-        filmByName();
+    findByName() {
+        let name;
+        rl.question("input index of your Film\n> ", (line) => {
+            rl.prompt();
+
+            name = line;        //getting index of my Films array
+            filmByName(name)
+                .then((film) => {
+                    console.table(film)
+                    rl.prompt();
+                })
+        });
     },
-    filmByActor(){
-        filmByActor();
+    filmByActor() {
+        let name;
+        rl.question("input index of your Film\n> ", (line) => {
+            rl.prompt();
+
+            name = line;        //getting index of my Films array
+            filmByActor(name)
+                .then((film) => {
+                    console.table(film)
+                    rl.prompt();
+                })
+        });
     },
-    import(){
+    import() {
         importFromFile();
+        console.log("Successfuly imported");
     }
 }
 

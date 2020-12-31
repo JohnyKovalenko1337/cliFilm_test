@@ -54,7 +54,7 @@ exports.addFilm = async (err, req, res, next) => {
             })
 
             actors.forEach(el => {
-                film.actors.names.push(el);
+                film.actors.push(el);
             });
             await film.save();
 
@@ -85,10 +85,9 @@ exports.getFilmById = async (req, res, next) => {
 };
 
 exports.deleteById = async (req, res, next) => {
-    const id = req.params.id;
-
+    const title = req.body.title;
     try {
-        await Film.findByIdAndRemove(id);
+        await Film.findOneAndDelete({title:title});
         return res.json({ message: "success", });
     }
     catch (error) {
@@ -97,8 +96,8 @@ exports.deleteById = async (req, res, next) => {
 };
 
 exports.filmByName = async (req, res, next) => {
-    const name = req.params.name;
-
+    const name = req.body.name;
+    console.log(name);
     try {
 
         const foundFilm = await Film.findOne({ title: name });
@@ -115,7 +114,7 @@ exports.filmByName = async (req, res, next) => {
 };
 
 exports.filmByActor = async (req, res, next) => {
-    const actor = req.params.actor;
+    const actor = req.body.name;
     try {
 
         const films = await Film.find();
@@ -123,7 +122,7 @@ exports.filmByActor = async (req, res, next) => {
         let film;
 
         films.forEach(el => {
-            if (el.actors.names.indexOf(actor) > -1) {
+            if (el.actors.indexOf(actor) > -1) {
                 film = el;
             }
         });
@@ -159,18 +158,21 @@ exports.importFromFile = async (req, res, next) => {
 
             }
             array.forEach(async(el)=>{
-                const film = new Film({
-                    title: el[0],
-                    released: el[1],
-                    format: el[2],
-                });
-                const actors = el[3].split(', ');
-                console.log(actors);
-                actors.forEach(act=>{
-                    film.actors.names.push(act);
-                });
-
-                await film.save();
+                let find = await Film.findOne({title:el[0]});
+                if(!find){
+                    let film = new Film({
+                        title: el[0],
+                        released: el[1],
+                        format: el[2],
+                    });
+                    let actors = el[3].split(', ');
+                    console.log(actors);
+                    actors.forEach(act=>{
+                        film.actors.push(act);
+                    });
+    
+                    await film.save();
+                }
             })
             return res.json({message:"success"});
 

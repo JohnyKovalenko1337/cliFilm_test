@@ -20,11 +20,11 @@ router.post('/add', addFilmSchema, addFilm);
 
 router.get('/film/:id', getFilmById);
 
-router.delete('/deleteById/:id', deleteById);
+router.post('/deleteByName', deleteById);
 
-router.get('/film/name/:name', filmByName);
+router.post('/film/name', filmByName);
 
-router.get('/film/actor/:actor', filmByActor);
+router.post('/film/actor', filmByActor);
 
 router.get('/film/file/import', importFromFile);
 

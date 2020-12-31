@@ -2,151 +2,135 @@ const http = require('http');
 
 const options = {
     hostname: 'localhost',
-    port: 3000,
+    port: 3001,
     headers: {
         'Content-Type': 'application/json'
     }
 };
 
-exports.addFilm = (title, description, creator) => {
+exports.addFilm = (title, released, format, actors) => {
 
-    options.path = '/server/add-film';
+    options.path = '/server/add';
     options.method = 'POST';
 
     const postData = JSON.stringify({
         'title': title,
-        'description': description,
-        'creator': creator
+        'released': released,
+        'format': format,
+        'actors': actors
     });
 
     http.request(options, (res) => {
-        res.on('data', (chunk) => { });
+        res.on('data', (chunk) => {
+        });
     }).end(postData);
 
 };
 
-exports.filmById = (id) => {
-    options.path = `/server/film/${id}`;
-    options.method = 'GET';
+exports.filmByName = (title) => {
+    options.path = `/server/film/name`;
+    options.method = 'POST';
 
+
+    const postData = JSON.stringify({
+        'name': title,
+    });
 
     return new Promise((resolve, reject) => {
         http.request(options, (res) => {
-            let tasks;
+            let film;
             res.setEncoding('utf8');
             res.on('data', (chunk) => {
                 const data = JSON.parse(chunk)
-                tasks = data.tasks;
+                film = data.film;
             });
             res.on('end', () => {
-                resolve(tasks);
+                resolve(film);
             })
         })
             .on('error', reject)
-    })
+            .end(postData);
+    });
+};
+
+exports.deleteFilm = (name) => {
+    options.path = `/server/deleteByName`;
+    options.method = 'POST';
+
+    const postData = JSON.stringify({
+        'title': name,
+
+    });
+
+    const req = http.request(options, (res) => {
+        console.log(name)
+        res.on('data', (chunk) => {
+            { }
+        });
+    }).end(postData);
+
 
 };
 
-
-exports.deleteFilm = (id) => {
-    options.path = `/server/deleteById/${id}`;
-    options.method = 'GET';
-
-    return new Promise((resolve, reject) => {
-
-        http.request(options, (res) => {
-            res.on('data', (chunk) => {
-                resolve(chunk)
-             });
-        })
-    })
-};
-
-exports.filmSorted = () => {
+exports.films = () => {
     options.path = `/server/film`;
     options.method = 'GET';
 
 
     return new Promise((resolve, reject) => {
-        http.request(options, (res) => {
-            let tasks;
+        const req = http.request(options, (res) => {
+            let films;
             res.setEncoding('utf8');
             res.on('data', (chunk) => {
                 const data = JSON.parse(chunk)
-                tasks = data.tasks;
+                films = data.films;
             });
             res.on('end', () => {
-                resolve(tasks);
+                resolve(films);
             })
         })
             .on('error', reject)
-    })
-
-};
-
-exports.filmByName = (name) => {
-    options.path = `/server/film/${name}`;
-    options.method = 'GET';
-
-
-    return new Promise((resolve, reject) => {
-        http.request(options, (res) => {
-            let tasks;
-            res.setEncoding('utf8');
-            res.on('data', (chunk) => {
-                const data = JSON.parse(chunk)
-                tasks = data.tasks;
-            });
-            res.on('end', () => {
-                resolve(tasks);
-            })
-        })
-            .on('error', reject)
+        req.end();
     })
 
 };
 
 exports.filmByActor = (actor) => {
-    options.path = `/server/film/${actor}`;
-    options.method = 'GET';
+    options.path = `/server/film/actor`;
+    options.method = 'POST';
 
+
+    const postData = JSON.stringify({
+        'name': actor,
+    });
 
     return new Promise((resolve, reject) => {
         http.request(options, (res) => {
-            let tasks;
+            let film;
             res.setEncoding('utf8');
             res.on('data', (chunk) => {
                 const data = JSON.parse(chunk)
-                tasks = data.tasks;
+                film = data.film;
             });
             res.on('end', () => {
-                resolve(tasks);
+                resolve(film);
             })
         })
             .on('error', reject)
-    })
-
+            .end(postData);
+    });
 };
 
 exports.importFromFile = () => {
-    options.path = `/server/film/import`;
+    options.path = `/server/film/file/import`;
     options.method = 'GET';
 
-
-    return new Promise((resolve, reject) => {
-        http.request(options, (res) => {
-            let tasks;
-            res.setEncoding('utf8');
-            res.on('data', (chunk) => {
-                const data = JSON.parse(chunk)
-                tasks = data.tasks;
-            });
-            res.on('end', () => {
-                resolve(tasks);
-            })
-        })
-            .on('error', reject)
+    const req = http.request(options, (res) => {
+        res.on('data', (chunk) => {
+            { }
+        });
     })
+    req.end()
 
 };
 

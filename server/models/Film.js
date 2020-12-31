@@ -16,9 +16,8 @@ const film = new Schema({
         enum: ['VHS', 'DVD', 'Blu-Ray'],
         required: true
     },
-    actors: {
-        names: [{ type: String }]
-    }
+    actors: [{ type: String }]
+    
 
 });
 
