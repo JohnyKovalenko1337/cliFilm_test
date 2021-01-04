@@ -41,10 +41,10 @@ exports.addFilm = async (err, req, res, next) => {
 
         try {
 
-            const foundFilm = await Film.findOne({ title: title });
+            const foundFilm = await Film.findOne({ title: title, released: released, actors: actors[0] });
 
             if (foundFilm) {
-                return res.status(400).json({ error: "Film with this title already exists" });
+                return res.status(400).json({ error: "Film already exists" });
             };
 
             const film = await Film.create({
@@ -87,7 +87,7 @@ exports.getFilmById = async (req, res, next) => {
 exports.deleteById = async (req, res, next) => {
     const title = req.body.title;
     try {
-        await Film.findOneAndDelete({title:title});
+        await Film.findOneAndDelete({ title: title });
         return res.json({ message: "success", });
     }
     catch (error) {
@@ -99,14 +99,22 @@ exports.filmByName = async (req, res, next) => {
     const name = req.body.name;
     console.log(name);
     try {
+        const films = await Film.find();
 
-        const foundFilm = await Film.findOne({ title: name });
+        const foundFilms = films.filter((el)=>{
+            if(el.title.indexOf(name) > -1){
+                return true;
+            }
+            else{
+                return false;
+            }
+        })
 
-        if (!foundFilm) {
+        if (foundFilms.length<1) {
             return res.status(400).json({ error: "Film with this title not found" });
         };
 
-        return res.json({ message: "success", film: foundFilm });
+        return res.json({ message: "success", film: foundFilms });
     }
     catch (error) {
         return res.status(500).json({ error: error });
@@ -119,19 +127,19 @@ exports.filmByActor = async (req, res, next) => {
 
         const films = await Film.find();
 
-        let film;
+        let actorFilms = [];
 
         films.forEach(el => {
             if (el.actors.indexOf(actor) > -1) {
-                film = el;
+                actorFilms.push(el);
             }
         });
 
-        if (!film) {
+        if (actorFilms.length<1) {
             return res.status(400).json({ error: "Film with this actor not found" });
         };
 
-        return res.json({ message: "success", film: film });
+        return res.json({ message: "success", film: actorFilms });
     }
     catch (error) {
         return res.status(500).json({ error: error });
@@ -149,7 +157,7 @@ exports.importFromFile = async (req, res, next) => {
 
                 while ((i + 1) % 5 != 0 && i < items.length) {
                     let item = items[i].split(': ')[1];
-                    obj.push(item.substring(0, item.length-1))
+                    obj.push(item.substring(0, item.length - 1))
                     i++;
                 }
                 i++;
@@ -157,9 +165,9 @@ exports.importFromFile = async (req, res, next) => {
 
 
             }
-            array.forEach(async(el)=>{
-                let find = await Film.findOne({title:el[0]});
-                if(!find){
+            array.forEach(async (el) => {
+                let find = await Film.findOne({ title: el[0] });
+                if (!find) {
                     let film = new Film({
                         title: el[0],
                         released: el[1],
@@ -167,14 +175,14 @@ exports.importFromFile = async (req, res, next) => {
                     });
                     let actors = el[3].split(', ');
                     console.log(actors);
-                    actors.forEach(act=>{
+                    actors.forEach(act => {
                         film.actors.push(act);
                     });
-    
+
                     await film.save();
                 }
             })
-            return res.json({message:"success"});
+            return res.json({ message: "success" });
 
         })
     }

@@ -3,7 +3,7 @@ const Joi = require('joi');
 exports.addFilmSchema = (req, res, next) => {
     const schema = Joi.object({
         title: Joi.string().required(),
-        released: Joi.number().required(),
+        released: Joi.number().min(1850).max(2020).required(),
         format: Joi.string().valid('VHS', 'DVD', 'Blu-Ray').required(),
         actors: Joi.array().items(Joi.string().required())
     });

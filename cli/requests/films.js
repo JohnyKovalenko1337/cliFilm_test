@@ -22,6 +22,10 @@ exports.addFilm = (title, released, format, actors) => {
 
     http.request(options, (res) => {
         res.on('data', (chunk) => {
+            let chuck = JSON.parse(chunk);
+            if(chuck.error){
+                console.log(chuck.error,'\n>')
+            }
         });
     }).end(postData);
 
@@ -42,7 +46,12 @@ exports.filmByName = (title) => {
             res.setEncoding('utf8');
             res.on('data', (chunk) => {
                 const data = JSON.parse(chunk)
-                film = data.film;
+                if(data.error){
+                    console.log(data.error,'\n>');
+                }
+                else{
+                    film = data.film;
+                }
             });
             res.on('end', () => {
                 resolve(film);

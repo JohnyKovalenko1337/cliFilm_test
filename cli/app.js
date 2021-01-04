@@ -2,7 +2,7 @@
 
 const readline = require('readline');
 const {
-    addFilm, deleteFilm,  films, filmByName, filmByActor, importFromFile
+    addFilm, deleteFilm, films, filmByName, filmByActor, importFromFile
 } = require('./requests/films');
 
 const { Film } = require('./cli-quers/films');
@@ -40,19 +40,26 @@ const commands = {
                         released = line;       // getting released year
                         rl.question(Film.format,
                             (line) => {
-                                if(formats.indexOf(line) == -1){
+                                if (formats.indexOf(line) == -1) {
                                     console.log("format not found start again")
                                     return;
                                 }
-                                else{
+                                else {
                                     format = line;     //getting format
                                 }
                                 rl.question(Film.actors,
                                     (line) => {
                                         actors = line.split(',');
-                                        addFilm(title, released, format, actors); // saving Film
-                                        console.log('Film has been added');
-                                        rl.prompt();
+                                        let found = actors.filter((item, index) => actors.indexOf(item) != index);
+                                        if (found.length>0) {
+                                            console.log("You have added equal actors, please add film again\n>")
+                                        }
+                                        else {
+                                            addFilm(title, released, format, actors); // saving Film
+                                            console.log('Film has been added');
+                                            rl.prompt();
+                                        }
+
                                     });
                             });
 
@@ -129,7 +136,7 @@ const commands = {
     },
     findByName() {
         let name;
-        rl.question("input index of your Film\n> ", (line) => {
+        rl.question("input name of your Film\n> ", (line) => {
             rl.prompt();
 
             name = line;        //getting index of my Films array
@@ -142,7 +149,7 @@ const commands = {
     },
     filmByActor() {
         let name;
-        rl.question("input index of your Film\n> ", (line) => {
+        rl.question("input actor of your Film\n> ", (line) => {
             rl.prompt();
 
             name = line;        //getting index of my Films array
